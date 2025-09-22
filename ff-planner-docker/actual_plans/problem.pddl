@@ -1,0 +1,6 @@
+(define (problem dummy-prob)
+  (:domain dummy)
+  (:objects)
+  (:init (a))
+  (:goal (b))
+)

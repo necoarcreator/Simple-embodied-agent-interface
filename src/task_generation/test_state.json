@@ -1,0 +1,20 @@
+{
+            'nodes': [
+                {"id": 1, 'class_name': "kitchen", "category": "Rooms", "properties": [], "states": []},
+                {"id": 2, 'class_name': "bedroom", "category": "Rooms", "properties": [], "states": []},
+                {"id": 3, 'class_name': "home_office", "category": "Rooms", "properties": [], "states": []},
+                {"id": 4, 'class_name': "bathroom", "category": "Rooms", "properties": [], "states": []},
+                {"id": 5, 'class_name': "character", "category": "", "properties": [], "states": []},
+                {"id": 6, 'class_name': "door", "category": "", "properties": ["CAN_OPEN"], "states": ["OPEN"]},
+                {"id": 7, 'class_name': "door", "category": "", "properties": ["CAN_OPEN"], "states": ["OPEN"]},
+                {"id": 8, 'class_name': "door", "category": "", "properties": ["CAN_OPEN"], "states": ["OPEN"]}
+            ],
+            'edges': [
+                {"from_id": 5, "to_id": 2, "relation_type": "INSIDE"},
+                {"from_id": 6, "to_id": 1, "relation_type": "BETWEEN"},
+                {"from_id": 6, "to_id": 2, "relation_type": "BETWEEN"},
+                {"from_id": 7, "to_id": 1, "relation_type": "BETWEEN"},
+                {"from_id": 7, "to_id": 3, "relation_type": "BETWEEN"},
+                {"from_id": 8, "to_id": 3, "relation_type": "BETWEEN"},
+                {"from_id": 8, "to_id": 4, "relation_type": "BETWEEN"}
+]}

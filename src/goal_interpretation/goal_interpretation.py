@@ -106,18 +106,18 @@ def should_continue(state : AgentState) -> str:
             content = content.strip()
             
             parsed = json.loads(content)
-            goal_key = "goals" if "goals" in parsed else None
-            relevant_key = "relevant_objects" if "relevant_objects" in parsed else "relevant objects" if "relevant objects" in parsed else None
-            action_key = "final_actions" if "final_actions" in parsed else "final actions" if "final actions" in parsed else None
+            node_goals = "node_goals" if "node_goals" in parsed else "node goals" if "node goals" in parsed else None
+            edge_goals = "edge_goals" if "edge_goals" in parsed else "edge goals" if "edge goals" in parsed else None
+            action_goals = "action_goals" if "action_goals" in parsed else "action goals" if "action goals" in parsed else None
 
-            if goal_key and relevant_key and action_key:
-                # print(f"Found keys: {goal_key}, {relevant_key}, {action_key} — GOAL INTERPRETATION COMPLETE")
+            if node_goals and edge_goals and action_goals:
+                # print(f"Found keys: {node_goals}, {edge_goals}, {action_goals} — GOAL INTERPRETATION COMPLETE")
                 return "end"
             else:
                 missing = []
-                if not goal_key: missing.append("goals")
-                if not relevant_key: missing.append("relevant_objects / relevant objects")
-                if not action_key: missing.append("final_actions / final actions")
+                if not node_goals: missing.append("node_goals / node goals")
+                if not edge_goals: missing.append("edge_goals / edge goals")
+                if not action_goals: missing.append("action_goals / action goals")
                 # print(f"Missing keys: {missing}. Found: {list(parsed.keys())}")
         except Exception as e:
             # print(f"JSON parse error: {e}")
@@ -189,9 +189,9 @@ def run_model(num_task, max_iterations=10):
                 content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
                 parsed = json.loads(content)
                 if all(key in parsed for key in [
-                    "goals", "relevant_objects", "final_actions"
+                    "node_goals", "edge_goals", "action_goals"
                 ]) or all(key in parsed for key in [
-                    "goals", "relevant objects", "final actions"
+                    "node goals", "edge goals", "action goals"
                 ]):
                     print(f"Goal interpretation completed at iteration {i+1}")
                     break

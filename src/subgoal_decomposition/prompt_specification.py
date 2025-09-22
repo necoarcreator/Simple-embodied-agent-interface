@@ -1,4 +1,4 @@
-from src.subgoal_decomposition.raw_prompt import prompt
+from src.subgoal_decomposition.raw_prompt_old import prompt
 from src.goal_interpretation.goal_interpretation import run_model
 from pathlib import Path
 import json, re
@@ -42,31 +42,51 @@ def find_init_states(relevant_objects, init_graph):
 def specificate_prompt(num_task = 0, num_trials = 10):
     goal_dict, raw_graph, task_description  = run_model(num_task, num_trials)
 
-    goals = ", ".join(goal_dict['goals']) + "\n"
-    obj_names = [obj["name"] for obj in goal_dict["relevant_objects"]]
-    relevant = ", ".join(obj_names) + "\n"
+    node_goals_list = goal_dict.get('node_goals') or goal_dict.get('node goals') or []
+    edge_goals_list = goal_dict.get('edge_goals') or goal_dict.get('edge goals') or []
+    action_goals_list = goal_dict.get('action_goals') or goal_dict.get('action goals') or []
+
+
+    obj_names = set()
+    for node in node_goals_list:
+        if node['class_name'] not in obj_names:
+            obj_names.add(node['class_name'])
+        
+    for edge in edge_goals_list:
+        if edge['from_name'] not in obj_names:
+            obj_names.add(edge['from_name'])
+        if edge['to_name'] not in obj_names:
+            obj_names.add(edge['to_name'])
+
+    for action in action_goals_list:
+        if action['target'] not in obj_names:
+            obj_names.add(action['target'])
+
+    node_goals = ", ".join(str(item) for item in node_goals_list) + "\n"
+    edge_goals = ", ".join(str(item) for item in edge_goals_list) + "\n"
+    action_goals = ", ".join(str(item) for item in action_goals_list) + "\n"
+
+    relevant = ', '.join([str(item) for item in obj_names])
     init_graph, all_found_objects = find_init_states(obj_names, raw_graph)
-    actions_list = goal_dict['final_actions']
-    actions_str_parts = []
-    for act_dict in actions_list:
-        action = act_dict['action']
-        target = act_dict['target']
-        actions_str_parts.append(f"{action}({target})")
-    actions_str = ", ".join(actions_str_parts) + "\n"
-    necessity = "True" if actions_str else "False"
+
+    
+    necessity = "True" if action_goals else "False"
 
     relations_types = get_relation_types()
     
     action_space = get_action_space()
 
     prompt_with_desc = prompt.replace("<task_name>", task_description)
-    prompt_with_goals = prompt_with_desc.replace("<gi_output>", goals)
-    prompt_with_relevants = prompt_with_goals.replace("<relevant_objects>", relevant)
+    prompt_with_node_goals = prompt_with_desc.replace("<node_goals>", node_goals)
+    prompt_with_edge_goals = prompt_with_node_goals.replace("<edge_goals>", edge_goals)
+    prompt_with_action_goals = prompt_with_edge_goals.replace("<action_goals>", action_goals)
+    prompt_with_necessity = prompt_with_action_goals.replace("<necessity>", necessity)
+
+    prompt_with_relevants = prompt_with_necessity.replace("<relevant_objects>", relevant)
     prompt_with_initial_states = prompt_with_relevants.replace("<initial_states>", init_graph)
-    prompt_with_final_actions = prompt_with_initial_states.replace("<final_actions>", actions_str)
-    prompt_with_relations = prompt_with_final_actions.replace("<relation_types>", relations_types)
+    prompt_with_relations = prompt_with_initial_states.replace("<relation_types>", relations_types)
     prompt_with_action_space = prompt_with_relations.replace("<action_space>", action_space)
-    prompt_with_seen_objects = prompt_with_action_space.replace("<objects_seen>", all_found_objects)
-    final_prompt = prompt_with_seen_objects.replace("<necessity>", necessity)
+    final_prompt = prompt_with_action_space.replace("<objects_seen>", all_found_objects)
+    
 
     return final_prompt, relevant, init_graph

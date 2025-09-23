@@ -1,0 +1,14 @@
+{
+    "node_precision": 51.0638,
+    "node_recall": 69.5652,
+    "node_f1": 58.8957,
+    "edge_precision": 34.4828,
+    "edge_recall": 21.2766,
+    "edge_f1": 26.3158,
+    "action_precision": 3.5714,
+    "action_recall": 38.8889,
+    "action_f1": 6.5421,
+    "all_precision": 27.3608,
+    "all_recall": 55.665,
+    "all_f1": 36.6883
+}

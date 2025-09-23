@@ -16,10 +16,11 @@ urllib3>=1.24.3
 networkx==2.3
 langchain-core
 langchain-ollama
+langchain_huggingface
 langgraph
-langchain-community
 langchain-chroma
 huggingface-hub
 sentence-transformers
 python-dotenv
 networkx
+ipywidgets

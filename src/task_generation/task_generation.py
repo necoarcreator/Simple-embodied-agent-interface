@@ -1,27 +1,34 @@
 import json
 from pathlib import Path
 
-def generate_graph_and_task(num_task):
+def generate_graph_and_task(task_id : str):
     base_folder = Path.cwd()
 
     graph_path = base_folder / "../../virtualhome/dataset/programs_processed_precond_nograb_morepreconds"
     graph_path = graph_path.resolve()
 
-    init_gr_path = graph_path / "init_and_final_graphs" / "TrimmedTestScene1_graph" / "graphs"
-    executables_path = graph_path / "executable_programs" / "TrimmedTestScene1_graph" / "executables"
+    init_gr_path = (graph_path / "init_and_final_graphs" / "TrimmedTestScene1_graph" / "graphs").resolve()
+    executables_path = (graph_path / "executable_programs" / "TrimmedTestScene1_graph" / "executables").resolve()
 
-    init_gr_files = [f.name for f in init_gr_path.glob('*.json')]
-    executables_files = [f.name for f in executables_path.glob('*.txt')]
-    init_gr_files.sort(), executables_files.sort()
+    init_gr_file  = "file" + task_id + ".json"
+    executable_file = "file" + task_id + ".txt"
 
-    with open (init_gr_path / f"{init_gr_files[num_task]}", "r", encoding='utf-8') as f:
+    with open (init_gr_path / init_gr_file, "r", encoding='utf-8') as f:
         init_graph = json.load(f)
-    with open (executables_path / f"{executables_files[num_task]}", "r", encoding='utf-8') as f:
+    with open (executables_path / executable_file, "r", encoding='utf-8') as f:
         executable = f.read()
 
     real_task_name = executable[:executable.index('\n', executable.index('\n') + 1)]
 
     return real_task_name, init_graph['init_graph']
+
+def auto_find_tasks_from_eai(eai_path : str) -> list[str]:
+    with open(eai_path, "r") as f:
+        prompts_list = json.load(f)
+    list_output_ids = []
+    for prompt in prompts_list:
+        list_output_ids.append(prompt['identifier'])
+    return list_output_ids
 
 
 def formate_init_graph(graph, context_num_objects = 100, context_num_connections = 100):

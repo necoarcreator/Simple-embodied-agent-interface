@@ -13,24 +13,24 @@ Relevant objects in the scene are:
 Relations in the scene are:
 <relations_in_scene>
 
-All possible relationships are the keys of the following dictionary, and the corresponding values are their descriptions:
+All possible relationships:
 <relation_types>
-Action goals is a list of actions that must be completed in the goals. The number of actions is less than three. If node goals and edge goals are not enough to fully describe the goal, add action goals to describe the goal. Below is a dictionary of possible actions, whose keys are all possible actions and values are corresponding descriptions. When output actions goal list, each action goal should be a dictionary with keys 'action' and 'target'.
+All possible actions:
 <action_space>
 
 Symbolic goals format:
 Node goals should be a list indicating the desired ending states of objects. Each goal in the list should be a dictionary with two keys 'name' and 'state'. The value of 'name' is the name of the object, and the value of 'state' is the desired ending state of the target object. For example, [{'name': 'washing_machine', 'state': 'PLUGGED_IN'}, {'name': 'washing_machine', 'state': 'CLOSED'}, {'name': 'washing_machine', 'state': 'ON'}] requires the washing_machine to be PLUGGED_IN, CLOSED, and ON. It can be a valid interpretation of natural language goal: 
-Task name: Wash clothes. 
-Task description: Washing pants with washing machine
-This is because if one wants to wash clothes, the washing machine should be functioning, and thus should be PLUGGED_IN, CLOSED, and ON.
+Edge goals is a list of dictionaries indicating the desired relationships between objects. Each goal in the list is a dictionary with three keys 'from_name', and 'relation' and 'to_name'. The value of 'relation' is desired relationship between 'from_name' object to 'to_name' object. The value of 'from_name' and 'to_name' should be an object name. The value of 'relation' should be an relationship. All relations should only be within the following set: ON, INSIDE, BETWEEN, CLOSE, FACING, HOLDS_RH, HOLDS_LH.
+Action goals is a list of actions that must be completed in the goals. The number of actions is less than three. If node goals and edge goals are not enough to fully describe the goal, add action goals to describe the goal. Below is a dictionary of possible actions, whose keys are all possible actions and values are corresponding descriptions. When output actions goal list, each action goal should be a dictionary with keys 'action' and 'description'.
+
+
 IMPORTANT:
 - Use ONLY object names that appear in "Relevant objects in the scene".
 - Use ONLY states from the "possible states" list for each object.
 - DO NOT invent new states like "HOME_OFFICE", "BUSY", "USING" — they are invalid.
 - DO NOT use states like "IN_FRIDGE", "ON_TABLE", "UNDER_SINK" — these are RELATIONS, not states.
 - Use edge goals with "INSIDE", "ON", "UNDER" for such cases.
-
-Edge goals is a list of dictionaries indicating the desired relationships between objects. Each goal in the list is a dictionary with three keys 'from_name', and 'relation' and 'to_name'. The value of 'relation' is desired relationship between 'from_name' object to 'to_name' object. The value of 'from_name' and 'to_name' should be an object name. The value of 'relation' should be an relationship. All relations should only be within the following set: ON, INSIDE, BETWEEN, CLOSE, FACING, HOLDS_RH, HOLDS_LH.
+- Note that you should call yourself as "character", not a "robot" or something else. 
 
 Now output the symbolic version of the goal. Output in json format, whose keys are 'node goal', 'edge goals', and 'action goals', and values are your output of symbolic node goals, symbolic edge goals, and symbolic action goals, respectively. That is, {'node goals': symbolic NODE GOALS, 'edge goals': symbolic EDGE GOALS, 'action goals': symbolic ACTION GOALS}. Please strictly follow the symbolic goal format.
 """

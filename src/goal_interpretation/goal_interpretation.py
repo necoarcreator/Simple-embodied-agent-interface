@@ -83,7 +83,7 @@ llm = ChatOllama(
 ).bind_tools(tools)
 
 def my_agent(state: AgentState):
-    system_prompt = SystemMessage(content=specificate_prompt(2, 30, 20))
+    system_prompt = SystemMessage(content=specificate_prompt("3_1", 30, 20))
     goal_message = HumanMessage(content=f"Goal: {state['task_description']}")
                                 
     all_messages = [system_prompt, goal_message] + list(state["messages"]) 
@@ -171,8 +171,8 @@ graph.add_conditional_edges(
 )
 app = graph.compile()
 
-def run_model(num_task, max_iterations=10):
-    task_name, init_graph = generate_graph_and_task(num_task)
+def run_model(id_task : str, max_iterations=10):
+    task_name, init_graph = generate_graph_and_task(id_task)
     initial_state = AgentState(
         messages=[],
         scene_graph=init_graph,
@@ -193,7 +193,6 @@ def run_model(num_task, max_iterations=10):
                 ]) or all(key in parsed for key in [
                     "node goals", "edge goals", "action goals"
                 ]):
-                    print(f"Goal interpretation completed at iteration {i+1}")
                     break
             except Exception as e:
                 print(f"Iteration {i+1}: JSON parse error: {e}")

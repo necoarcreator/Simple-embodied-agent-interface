@@ -13,9 +13,9 @@ llm = ChatOllama(
     reasoning=False,
 )
 
-def run_model(num_task, max_iterations=10):
+def run_model(id_task : str, max_iterations : int = 10):
 
-    task, relevant_objs, seen_graph = specificate_prompt(num_task = 2, num_trials = 10)
+    task, relevant_objs, seen_graph = specificate_prompt(id_task = id_task, num_trials = 10)
     parsed = None
     for i in range(max_iterations):
         last_message = llm.invoke(task)

@@ -39,8 +39,8 @@ def find_init_states(relevant_objects, init_graph):
 
     return "\n".join(sufficient_init_graph), ", ".join(unique_objects)
 
-def specificate_prompt(num_task = 0, num_trials = 10):
-    goal_dict, raw_graph, task_description  = run_model(num_task, num_trials)
+def specificate_prompt(id_task : str, num_trials = 10):
+    goal_dict, raw_graph, task_description  = run_model(id_task, num_trials)
 
     node_goals_list = goal_dict.get('node_goals') or goal_dict.get('node goals') or []
     edge_goals_list = goal_dict.get('edge_goals') or goal_dict.get('edge goals') or []
@@ -49,18 +49,14 @@ def specificate_prompt(num_task = 0, num_trials = 10):
 
     obj_names = set()
     for node in node_goals_list:
-        if node['class_name'] not in obj_names:
-            obj_names.add(node['class_name'])
+        if node['name'] not in obj_names:
+            obj_names.add(node['name'])
         
     for edge in edge_goals_list:
         if edge['from_name'] not in obj_names:
             obj_names.add(edge['from_name'])
         if edge['to_name'] not in obj_names:
             obj_names.add(edge['to_name'])
-
-    for action in action_goals_list:
-        if action['target'] not in obj_names:
-            obj_names.add(action['target'])
 
     node_goals = ", ".join(str(item) for item in node_goals_list) + "\n"
     edge_goals = ", ".join(str(item) for item in edge_goals_list) + "\n"

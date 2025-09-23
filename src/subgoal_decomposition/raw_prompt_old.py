@@ -22,7 +22,7 @@ RELATION TYPES
 - Add intermediate states if necessary to improve logical consistency.
 - If you want to change state of A, while A is in B and B is closed, you should make sure B is open first.
 - Your output format should strictly follow this json format: {"necessity_to_use_action": <necessity>, "actions_to_include": [<actions>], "output": [<your subgoal plan>]}, where in <necessity> you should put "yes" or "no" to indicate whether actions should be included in subgoal plans. If you believe it is necessary to use actions, in the field <actions>, you should list all actions you used in your output. Otherwise, you should simply output an empty list []. In the field <your subgoal plan>, you should list all Boolean expressions in the required format and the temporal order.
-
+- Note that you should call yourself as "character", not a "robot" or something else. 
 Below is an example for your better understanding.
 # Example: Task category is "Browse internet"
 ## Relevant Objects in the Scene

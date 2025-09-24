@@ -95,6 +95,7 @@ output/virtualhome/
 
 <img width="989" height="614" alt="image" src="https://github.com/user-attachments/assets/05bc4ca0-4125-42cd-bf33-8434f4f0db6b" />
 <img width="1114" height="532" alt="image" src="https://github.com/user-attachments/assets/976684fd-a634-4950-b271-5eb727b2238c" />
+<img width="889" height="589" alt="image" src="https://github.com/user-attachments/assets/85810145-a461-46f6-9877-ff8d47fc4841" />
 
 ## ⚙️ Notes on VirtualHome  
 ❗ The virtualhome/ folder is critical for your pipeline — it contains:   

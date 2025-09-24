@@ -289,7 +289,7 @@ def my_agent(state: AgentState):
 
 def update_subgoals_from_scene(state: AgentState) -> None:
     """
-    Updates state["subgoal_list"] by removing goals that are satisfied in state["scene_graph"].
+    Обновляет state["subgoal_list"], удаляя цели, которые выполнены в state["scene_graph"].
     """
     raise NotImplementedError("Yet to be implemented: need to pass .pddl plan to VirtualHome executor" \
                                     "and update the graph scene, then check if LTL subgoals are achieved")

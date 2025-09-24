@@ -93,6 +93,8 @@ Baseline Metrics
 For comparison, author-provided baseline metrics (from SOTA proprietary models) are available in:  
 output/virtualhome/
 
+<img width="989" height="614" alt="image" src="https://github.com/user-attachments/assets/05bc4ca0-4125-42cd-bf33-8434f4f0db6b" />
+
 ## ⚙️ Notes on VirtualHome  
 ❗ The virtualhome/ folder is critical for your pipeline — it contains:   
 

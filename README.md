@@ -25,7 +25,7 @@ simple-embodied-agent-interface/
 │ ├── subgoal_decomposition/ # System prompt, few-shot decomposition, structured output validation  
 │ └── action_sequencing/ # System prompt, ReAct + LLM+P agent, step simulation stub, subgoal removal logic  
 │ ├── notebooks/ # Directory with jupiter notebook files  
-│ │ └── sandbox.ipynb # 🎯 Main entry point: experiments, metric calculation, module orchestration  
+│ └── sandbox.ipynb # 🎯 Main entry point: experiments, metric calculation, module orchestration  
 ├── virtualhome/ # Critical: contains dataset files & semantic dictionaries (synonyms, relations, states, etc.)  
 │ ├── dataset/ # EAI-provided VirtualHome dataset (required for pipeline)  
 │ ├── resources/ # Utility dictionaries for environment semantics (required for pipeline)  

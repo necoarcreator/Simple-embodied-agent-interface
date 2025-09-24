@@ -2,8 +2,13 @@ from src.goal_interpretation.raw_prompt_old import prompt
 import json 
 from src.task_generation.task_generation import *
 
-def specificate_prompt(num_task = 0, num_objects = 20, num_relations = 20):
-    goal, init_gr = generate_graph_and_task(num_task)
+def specificate_prompt(task_id : str, num_objects : int = 20, num_relations : int = 20) -> str:
+    """
+    Переписывает шаблон промпта goal interpretation модуля под задачу с айди task_id.
+    Статически в контекст первые num_objects объектов и num_relations отношений между ними.
+    Возвращает готовый к использованию промпт.
+    """
+    goal, init_gr = generate_graph_and_task(task_id)
 
     object_in_scene, relations_in_scene = formate_init_graph(init_gr, num_objects)
 

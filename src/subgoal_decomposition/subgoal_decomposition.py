@@ -13,8 +13,13 @@ llm = ChatOllama(
     reasoning=False,
 )
 
-def run_model(id_task : str, max_iterations : int = 10):
-
+def run_model(id_task : str, max_iterations : int = 10) -> tuple[dict, str, str]:
+    """
+    Запуск subgoal_decomposition модуля. Сделан на основе few-shot и информации, полученной 
+    предыдущим ReAct модулем + валидации состояний и связей релевантных объектов. 
+    Пробрасывает имена и состояния релевантных объектов дальше, в action_sequencing модуль.
+    Ответ формируется в LTL формате, как список упорядоченных целей-состояний и целей-связей.
+    В случае, когда таких целей сделать нельзя, делает цели-действия."""
     task, relevant_objs, seen_graph = specificate_prompt(id_task = id_task, num_trials = 10)
     parsed = None
     for i in range(max_iterations):

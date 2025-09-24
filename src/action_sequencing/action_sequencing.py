@@ -11,19 +11,27 @@ from warnings import filterwarnings
 from pprint import pprint
 
 from src.action_sequencing.raw_prompt import prompt
-from src.task_generation.task_generation import generate_graph_and_task
+from src.task_generation.task_generation import generate_graph_and_task, add_possible_states_to_graph 
 from src.action_sequencing.prompt_specification import specificate_prompt
 
 filterwarnings('ignore')
 load_dotenv()
 
+# TODO: почему-то не срабатывает остановка генерации при >=3 pddl_attempts создать pddl план. Нужно отладить
 class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
     scene_graph: dict
     subgoal_list : list[str]
     pddl_attempts : int
 
-def validate_pddl_output(pddl_text) -> tuple[bool, str]:
+def validate_pddl_output(pddl_text : str) -> tuple[bool, str]:
+    """
+    Получает сгенерированный pddl как строку и пытается распарсить её.
+    Возвращает флаг, получилось ли распарсить и лог возможных ошибок.
+    Проверяет не только наличие === domain.pddl === и === problem.pddl ===,
+    но и отсутствие дупликатов, а также базово синтаксис планов (на уровне скобочной последовательности).
+    Сохраняет задачу и домен в папку "ff-planner-docker.actual_plans".
+    """
     if "=== domain.pddl ===" not in pddl_text:
         return False, "Missing domain.pddl"
     if "=== problem.pddl ===" not in pddl_text:
@@ -45,12 +53,13 @@ def validate_pddl_output(pddl_text) -> tuple[bool, str]:
     # Извлекаем domain (от конца заголовка до начала problem)
     domain_text = pddl_text[domain_start:problem_start].strip()
 
+    # TODO: надо парсить не до конца строки, а как-то научиться отделять мусор генерации после конца problem.pddl.
     # Извлекаем problem (от конца заголовка problem до конца строки)
     problem_end_marker = "=== problem.pddl ==="
     problem_start_idx = pddl_text.find(problem_end_marker) + len(problem_end_marker)
     problem_text = pddl_text[problem_start_idx:].strip()
 
-    # Проверим, что скобки сбалансированы
+    # Проверим скобочную последовательность по балансу числа скобок.
     if domain_text.count('(') != domain_text.count(')'):
         return False, f"Domain PDDL has unbalanced parentheses. Open: {domain_text.count('(')}, Close: {domain_text.count(')')}"
     if problem_text.count('(') != problem_text.count(')'):
@@ -65,18 +74,19 @@ def validate_pddl_output(pddl_text) -> tuple[bool, str]:
 
 def run_planner(domain_name : str, problem_name : str) -> str:
     """
-    Runs Fast Downward classic PDDL planner and returns the optimal plan if possible.
-    Arguments: 
-    domain_path - the name of generated domain file, e.g. "domain.pddl"
-    problem_name - the name of generated problem file, e.g. "problem.pddl"
-    Note that those names are the same as you generated before.
+    Запускает классический планировщик PDDL Fast Downward через docker + subprocess
+    и возвращает оптимальный план, если это возможно.
 
+    Аргументы:
+    domain_path - имя сгенерированного файла домена, например, "domain.pddl"
+    problem_name - имя сгенерированного файла задачи, например, "problem.pddl"
+    Важно, что эти имена должны совпадать с теми, которые агент сгенерировал ранее.
     """
     base_path = (Path.cwd() / ".." / ".." / "ff-planner-docker" / "actual_plans").resolve()
     
-    # Используем только имена файлов для передачи в контейнер
-    domain_filename = Path(domain_name).name  # "domain.pddl"
-    problem_filename = Path(problem_name).name  # "problem.pddl"
+    # Важно не перепутать имена файлов в докер-контейнере и на хосте.
+    domain_filename = Path(domain_name).name
+    problem_filename = Path(problem_name).name
 
     # Путь к плану
     plan_filename = "plan.pddl"
@@ -94,18 +104,20 @@ def run_planner(domain_name : str, problem_name : str) -> str:
         f"/planning/{problem_filename}",
         "--search", "astar(lmcut())",
     ]
-    # удаляем старый план во избежание багов
+    # удаляем старый план во избежание багов генерации
     if plan_file_host.exists():
         plan_file_host.unlink() 
         
     result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8')
     
+    # Если выполнение плана успешно, возвращаем ответ планировщика
     if result.returncode  == 0:
         if plan_file_host.exists():
             with open(plan_file_host, "r", encoding="utf-8") as f:
                 plan_content = f.read().strip()
             return f"Success: {plan_content}"
         
+    # Отправляем логи агенту. См. https://www.fast-downward.org/latest/documentation/exit-codes/
     log = result.stderr if result.stderr else result.stdout
     if 1 <= result.returncode  < 10:
         return "Partly successful termination: at least one plan was \
@@ -118,6 +130,7 @@ def run_planner(domain_name : str, problem_name : str) -> str:
     else:
         return f"Unrecoverable failure: {log}"
 
+# решил добавить one-shot прямо в докстринг, чтобы агент не забывал синтаксис планов.
 @tool
 def plan_from_pddl(pddl_text: str) -> str:
     """
@@ -185,9 +198,14 @@ def plan_from_pddl(pddl_text: str) -> str:
     
     plan_result = run_planner("domain.pddl", "problem.pddl")
     return plan_result
+
 @tool
 def find_object(object_name: str, graph: dict = None) -> str:
-    """Finds an object on scene by it's name (with synonims) and returns it's id, states, properties."""
+    """Static search for object name matches
+    (up to a synonym: synonym lists are stated in the specific file).
+    Returns: the object, its properties and states: current and possible.
+    An agent should only pass the object_name field, the graph wil be passed automatically.
+    """
 
     base_folder = Path.cwd() / "../../virtualhome/resources/"
     base_folder.resolve()
@@ -229,7 +247,11 @@ def find_object(object_name: str, graph: dict = None) -> str:
 
 @tool
 def get_relations(object_id: int, graph: dict = None) -> str:
-    """Return all edges, connected with this node by id (both directions)"""
+    """Static search for relationships for a target object (by ID match).
+    Returns: a string with all relationships involving the object
+    (without names, only IDs).
+    An agent should only pass the object_id field, the graph wil be passed automatically.
+    """
 
     connections = []
 
@@ -273,7 +295,12 @@ def update_subgoals_from_scene(state: AgentState) -> None:
                                     "and update the graph scene, then check if LTL subgoals are achieved")
     
 def should_continue(state : AgentState) -> str:
-    """Determine if we should continue or end the reasoning."""
+    """Определяет, нужно ли продолжать генерацию. 
+    Останавливает, если после вызова планировщика:
+    а) синтаксис был валидным, можно было составить оптимальный план -> success;
+    б) синтаксис был валидным, но план оказался неразрешимым -> fail;
+    в) агент сдался сам после нескольких попыток и написал код завершения в ответе __plan_unsolvable__ -> fail.
+    """
     last_message = state["messages"][-1]
     if isinstance(last_message, ToolMessage) and last_message.name == "plan_from_pddl":
         content = last_message.content.strip()
@@ -296,7 +323,11 @@ def should_continue(state : AgentState) -> str:
     return "continue"
 
 def tool_executor_node(state: AgentState) -> dict:
-    """Custom tool node that injects scene_graph from state into tool calls."""
+    """
+    Кастомная нода langgraph для вызова tools с замыканием, чтобы модели не приходилось самой передавать
+    граф сцены как параметр.
+    """
+
     messages = state["messages"]
     last_message = messages[-1]
     if not hasattr(last_message, "tool_calls") or not last_message.tool_calls:
@@ -315,6 +346,7 @@ def tool_executor_node(state: AgentState) -> dict:
         elif tool_name == "plan_from_pddl":
             args["pddl_text"] = str(args["pddl_text"])
 
+            # TODO: здесь не отрабатывает принудительная остановка вызова тулза, если было >= 3 pddl_attempts.
             state["pddl_attempts"] = state.get("pddl_attempts", 0) + 1
             if state["pddl_attempts"] >= 3:
                 return {"messages": "You've reached the limit of callings \
@@ -332,13 +364,19 @@ def tool_executor_node(state: AgentState) -> dict:
 
     return {"messages": tool_outputs}
 
-def node_success(state: AgentState):
-    state["messages"].append(AIMessage(content='{"status": "success", "message": "All goals achieved"}'))
-    return state
+def node_success(state: AgentState) -> dict:
+    """
+    Нода - заглушка, добавляющая в конец сообщение об успешном выполнении целей.
+    """
+    new_messages = state['messages'] + [AIMessage(content='{"status": "success", "message": "All goals achieved"}')]
+    return {'messages' : new_messages}
 
-def node_fail(state: AgentState):
-    state["messages"].append(AIMessage(content='{"status": "fail", "message": "Plan is infeasible"}'))
-    return state
+def node_fail(state: AgentState) -> dict:
+    """
+    Нода - заглушка, добавляющая в конец сообщение о неудаче при выполнении целей.
+    """
+    new_messages = state['messages'] + [AIMessage(content='{"status": "fail", "message": "Plan is infeasible"}')]
+    return {'messages' : new_messages}
 
 graph = StateGraph(AgentState)
 graph.add_node("agent", my_agent)
@@ -361,13 +399,16 @@ graph.add_edge("success", END)
 graph.add_edge("fail", END)
 
 app = graph.compile()
+# TODO: почему-то не отрабатывает как следует и всё равно = 25. Проверить документацию.
 config = {"recursion_limit": 50}
 
 def run_model(num_task, max_iterations=10):
     
     prompt, subgoals = specificate_prompt(num_task, max_iterations)
     _, init_graph = generate_graph_and_task(num_task)
-    
+    # добавляем ещё и поле possible_states
+    add_possible_states_to_graph(init_graph)
+
     system_prompt = SystemMessage(content=prompt)
     initial_state = AgentState(
         messages=[system_prompt],

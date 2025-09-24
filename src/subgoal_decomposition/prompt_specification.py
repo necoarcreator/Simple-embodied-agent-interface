@@ -1,10 +1,14 @@
 from src.subgoal_decomposition.raw_prompt_old import prompt
-from src.goal_interpretation.goal_interpretation import run_model
+from src.goal_interpretation.goal_interpretation import run_baseline_model
 from pathlib import Path
 import json, re
 from src.task_generation.task_generation import *
 
-def find_init_states(relevant_objects, init_graph):
+def find_init_states(relevant_objects : list[str], init_graph : dict) -> tuple[str, str]:
+    """
+    Статический поиск по графу: ищем ground truth состояния 
+    релевантных объектов (с точностью до синонимов) и связей из сцены.
+    """
     base_folder = Path.cwd() / "../../virtualhome/resources/"
     base_folder.resolve()
     synonyms_path = base_folder / "class_name_equivalence.json"
@@ -39,8 +43,12 @@ def find_init_states(relevant_objects, init_graph):
 
     return "\n".join(sufficient_init_graph), ", ".join(unique_objects)
 
-def specificate_prompt(id_task : str, num_trials = 10):
-    goal_dict, raw_graph, task_description  = run_model(id_task, num_trials)
+def specificate_prompt(id_task : str, num_trials :int = 10) -> tuple[str, str, str]:
+    """
+    Создаёт промпт для subgoal_decomposition модуля, возвращает, помимо промпта, ещё
+    полезные сведения ою именах релевантных объектов, списке их состояний и связей.
+    (которые будут использованы в action_sequencing модуле)."""
+    goal_dict, raw_graph, task_description  = run_baseline_model(id_task, num_trials)
 
     node_goals_list = goal_dict.get('node_goals') or goal_dict.get('node goals') or []
     edge_goals_list = goal_dict.get('edge_goals') or goal_dict.get('edge goals') or []

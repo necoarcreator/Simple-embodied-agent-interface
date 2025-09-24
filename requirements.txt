@@ -24,3 +24,5 @@ sentence-transformers
 python-dotenv
 networkx
 ipywidgets
+seaborn
+pandas

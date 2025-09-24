@@ -28,7 +28,7 @@ simple-embodied-agent-interface/
 │ │ └── sandbox.ipynb # 🎯 Main entry point: experiments, metric calculation, module orchestration  
 ├── virtualhome/ # Critical: contains dataset files & semantic dictionaries (synonyms, relations, states, etc.)  
 │ ├── dataset/ # EAI-provided VirtualHome dataset (required for pipeline)  
-│ ├── resources/ # Utility dictionaries for environment semantics (required for pipeline)
+│ ├── resources/ # Utility dictionaries for environment semantics (required for pipeline)  
 │ └── VirtualHome simulator files (not needed for this pipe)  
 ├── ff-planner-docker/ # Fast Downward planner setup (for PDDL generation and planning experiments)  
 │ ├── pddl_tasks/ # Generated PDDL tasks by your agents  

@@ -1,7 +1,7 @@
 # Simple-embodied-agent-interface
 
 Implementation of goal interpretation, subgoal decomposition, and action sequencing modules for an embodied agent in the VirtualHome simulator.    
-This project is built as a modular pipeline to interface with the [Embodied Agent Interface (EAI)](https://github.com/embodied-agent-interface/embodied-agent-interface) evaluation framework.  
+This project is built as a modular pipeline to interface with the [Embodied Agent Interface (EAI)](https://github.com/embodied-agent-interface/embodied-agent-interface) evaluation framework and [VirtualHome simulator](https://github.com/xavierpuigf/virtualhome) resourses.  
 
 ---
 
@@ -124,3 +124,4 @@ Special thanks to the authors of the EAI pipeline (https://github.com/embodied-a
 for making it open source.  
 This project would not have been possible without the authors of the fast-downward planner (https://github.com/aibasel/downward),   
 and thanks to them for their contributions to open source.  
+I would also like to thank the authors of the VirtualHome simulator for creating this product (https://github.com/xavierpuigf/virtualhome).

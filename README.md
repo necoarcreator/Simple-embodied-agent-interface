@@ -8,11 +8,11 @@ This project is built as a modular pipeline to interface with the [Embodied Agen
 ## 📌 Overview  
 
 This repository implements three core modules for an embodied agent:  
-- **Goal Interpretation**: Parses natural language goals into structured representations.  
-- **Subgoal Decomposition**: Breaks down high-level goals into executable subgoals.  
-- **Action Sequencing**: Generates ordered sequences of actions using ReAct + LLM+P agents.  
+- **Goal Interpretation**: Parses natural language goals into structured symbolic representations.  
+- **Subgoal Decomposition**: Breaks down high-level symbolic goals into LTL-logical queue of subgoals.  
+- **Action Sequencing**: Generates .pddl plans from LTL-logical queue of subgoals using ReAct + LLM+P agent. The output is a valid PDDL plan if possible (and performing a step in the simulator environment in future versions).  
 
-The pipeline uses prompts, few-shot examples, and structured output validation. Experiments and metrics are tracked via `sandbox.ipynb`, which serves as the main entry point.  
+The pipeline uses prompts, few-shot examples, ReAct agents, LLP+P agents, structured output validation. Experiments and metrics are tracked via `sandbox.ipynb`, which serves as the main entry point.  
 
 > ⚠️ **Important**: To validate your outputs against EAI’s official metrics, you must install the [Embodied Agent Interface](https://github.com/embodied-agent-interface/embodied-agent-interface).  
 
@@ -22,7 +22,7 @@ simple-embodied-agent-interface/
 ├── src/  
 │ ├── task_generation/ # Utilities for task selection, scene graph, synonyms, state/relation dicts, EAI ID mapping  
 │ │ └── sandbox.ipynb # 🎯 Main entry point: experiments, metric calculation, module orchestration  
-│ ├── goal_interpretation/ # System prompt, task-specific prompt generation, ReAct agent, structured output validation  
+│ ├── goal_interpretation/ # System prompt, task-specific prompt generation, ReAct agent / ReAct + graph RAG agent, structured output validation  
 │ ├── subgoal_decomposition/ # System prompt, few-shot decomposition, structured output validation  
 │ └── action_sequencing/ # System prompt, ReAct + LLM+P agent, step simulation stub, subgoal removal logic  
 │    

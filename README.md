@@ -21,23 +21,22 @@ The pipeline uses prompts, few-shot examples, ReAct agents, LLP+P agents, struct
 simple-embodied-agent-interface/  
 ├── src/  
 │ ├── task_generation/ # Utilities for task selection, scene graph, synonyms, state/relation dicts, EAI ID mapping  
-│ │ └── sandbox.ipynb # 🎯 Main entry point: experiments, metric calculation, module orchestration  
 │ ├── goal_interpretation/ # System prompt, task-specific prompt generation, ReAct agent / ReAct + graph RAG agent, structured output validation  
 │ ├── subgoal_decomposition/ # System prompt, few-shot decomposition, structured output validation  
 │ └── action_sequencing/ # System prompt, ReAct + LLM+P agent, step simulation stub, subgoal removal logic  
-│    
+│ ├── notebooks/ # Directory with jupiter notebook files  
+│ │ └── sandbox.ipynb # 🎯 Main entry point: experiments, metric calculation, module orchestration  
 ├── virtualhome/ # Critical: contains dataset files & semantic dictionaries (synonyms, relations, states, etc.)  
 │ ├── dataset/ # EAI-provided VirtualHome dataset (required for pipeline)  
-│ └── ... # Other utility files for environment semantics  
-│  
+│ ├── resources/ # Utility dictionaries for environment semantics (required for pipeline)
+│ └── VirtualHome simulator files (not needed for this pipe)  
 ├── ff-planner-docker/ # Fast Downward planner setup (for PDDL generation and planning experiments)  
 │ ├── pddl_tasks/ # Generated PDDL tasks by your agents  
 │ └── Dockerfile # For building Fast Downward container  
 │  
 ├── my_llm_outputs/ # 📁 Your generated outputs (e.g., goal interpretation results for EAI dataset)  
 ├── my_eai_results/ # 📊 Evaluation metrics computed by your pipeline  
-├── output/virtualhome/ # EAI's author-provided baseline metrics to compare (from SOTA proprietary models)
-├── logs/ # Logs from runs  
+├── output/virtualhome/ # EAI's author-provided baseline metrics to compare (from SOTA proprietary models)  
 ├── requirements.txt # Python dependencies  
 ├── .gitignore  
 ├── LICENSE  

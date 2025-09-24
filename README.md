@@ -36,7 +36,7 @@ simple-embodied-agent-interface/
 │  
 ├── my_llm_outputs/ # 📁 Your generated outputs (e.g., goal interpretation results for EAI dataset)  
 ├── my_eai_results/ # 📊 Evaluation metrics computed by your pipeline  
-├── output/virtualhome/ # Legacy or intermediate output folder  
+├── output/virtualhome/ # EAI's author-provided baseline metrics to compare (from SOTA proprietary models)
 ├── logs/ # Logs from runs  
 ├── requirements.txt # Python dependencies  
 ├── .gitignore  
